@@ -8,8 +8,11 @@ Capture cam;
 OpenCV opencv;
 Rectangle[] eyes;
 
-int inputWidth = 640;
-int inputHeight = 480;
+int inputWidth = 320;
+int inputHeight = round(inputWidth * 0.75);
+
+int viewWidth = 640;
+int viewHeight = 480;
 
 int centerPointIndex = 0;
 PVector[] centerPoints = new PVector[100];
@@ -17,11 +20,11 @@ PVector[] centerPoints = new PVector[100];
 int eyeRectIndex = 0;
 Rectangle[] eyeRects = new Rectangle[50];
 
-float xPadding = 0.2;
-float yPadding = 0.2;
+float xPadding = 0.05;
+float yPadding = 0.05;
 
-float scaleFactor = 1.2;
-int minNeighbors = 15;
+float scaleFactor = 1.1;
+int minNeighbors = 20 ;
 
 MovingPVector center = new MovingPVector();
 
@@ -78,24 +81,26 @@ void draw() {
   detectEyes(frame);
 
   // draw detections and images
-  image(frame, 0, 0);
+  image(frame, 0, 0, viewWidth, viewHeight);
   markDetections();
 
   renderROIs();
 
   // render plot
   pushMatrix();
-  translate(inputWidth, inputHeight / 2);
-  plotValues(width - inputWidth, inputHeight / 2);
+  translate(viewWidth, viewHeight / 2);
+  plotValues(width - viewWidth, viewHeight / 2);
   popMatrix();
 
   // render sight
   pushMatrix();
-  translate(inputWidth + 350, 20);
+  translate(viewWidth + 350, 20);
   plotSight(200, 200);
   popMatrix();
 
   center.update();
+
+  tryMouseMove();
 
   cp5.draw();
   surface.setTitle(String.format(getClass().getName()+ "  [fps %6.2f]", frameRate));
@@ -106,8 +111,12 @@ void markDetections()
   noFill();
   stroke(0, 255, 0);
   strokeWeight(3);
+
+  float xratio = viewWidth / inputWidth;
+  float yratio = viewHeight / inputHeight;
+
   for (int i = 0; i < eyes.length; i++) {
-    rect(eyes[i].x, eyes[i].y, eyes[i].width, eyes[i].height);
+    rect(eyes[i].x * xratio, eyes[i].y * yratio, eyes[i].width * xratio, eyes[i].height * yratio);
   }
 }
 
@@ -157,7 +166,7 @@ void renderROIs()
 
   // render output
   pushMatrix();
-  translate(inputWidth, 0);
+  translate(viewWidth, 0);
   scale(4);
 
   PImage roi = opencv.getOutput().get(eye.x, eye.y, eye.width, eye.height);
@@ -304,4 +313,10 @@ Rectangle getAverageRectangle()
   average.height /= counter;
 
   return average;
+}
+
+void keyPressed()
+{
+  mouseMoveOn = !mouseMoveOn;
+  println("Mouse Move On: " + mouseMoveOn);
 }

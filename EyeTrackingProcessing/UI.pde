@@ -20,8 +20,8 @@ void setupUI()
   cp5.setFont(font, 14);
   cp5.setColorActive(color(255, 132, 124));
 
-  int h = inputHeight;
-  h += 50;
+  int h = viewHeight;
+  h += 40;
   cp5.addLabel("Padding")
     .setPosition(10, h);
 
@@ -38,7 +38,7 @@ void setupUI()
     .showTickMarks(false)
     .setLabel("Y");
 
-  h += 50;
+  h += 40;
   cp5.addLabel("Cascade Classifier")
     .setPosition(10, h);
 
@@ -54,6 +54,24 @@ void setupUI()
     .setNumberOfTickMarks(31)
     .showTickMarks(false)
     .setLabel("Min Neighbors");
+  uiHeight = h + 200;
+
+  h += 40;
+  cp5.addLabel("Mouse")
+    .setPosition(10, h);
+
+  h += 25;
+  cp5.addSlider("mouseSpeed", 10, 150, 10, h, 100, 20)
+    .setRange(1, 50)
+    .setNumberOfTickMarks(51)
+    .showTickMarks(false)
+    .setLabel("Speed");
+
+  cp5.addSlider("mouseShift", 10, 150, 10 + 250, h, 100, 20)
+    .setRange(0.0, 0.5)
+    .setNumberOfTickMarks(51)
+    .showTickMarks(false)
+    .setLabel("Shift");
   uiHeight = h + 200;
 
   isUIInitialized = true;
