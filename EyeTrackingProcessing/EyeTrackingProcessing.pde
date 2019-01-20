@@ -14,10 +14,13 @@ int inputHeight = 480;
 int centerPointIndex = 0;
 PVector[] centerPoints = new PVector[100];
 
+int eyeRectIndex = 0;
+Rectangle[] eyeRects = new Rectangle[50];
+
 float xPadding = 0.2;
 float yPadding = 0.2;
 
-float scaleFactor = 1.4;
+float scaleFactor = 1.2;
 int minNeighbors = 15;
 
 MovingPVector center = new MovingPVector();
@@ -29,7 +32,10 @@ void setup() {
   setupUI();
 
   opencv = new OpenCV(this, inputWidth, inputHeight);
-  opencv.loadCascade(OpenCV.CASCADE_EYE);  
+  opencv.loadCascade(OpenCV.CASCADE_EYE);
+
+  center.x = 0.5f;
+  center.y = 0.5f;
 
   String[] cameras = Capture.list();
 
@@ -129,6 +135,9 @@ void renderROIs()
     }
   }
 
+  addRect(eye);
+  eye = getAverageRectangle();
+
   // read ROI  
   opencv.setROI(eye.x, eye.y, eye.width, eye.height);
   //opencv.invert();
@@ -152,20 +161,32 @@ void renderROIs()
   scale(4);
 
   PImage roi = opencv.getOutput().get(eye.x, eye.y, eye.width, eye.height);
-  image(roi, 0, 0, eye.width, eye.height);
+
+  PVector cPos = new PVector(50, 50);
+  PVector imgPos = PVector.sub(eyeCenter, cPos);
+  imgPos.mult(0.5);
+  imgPos = new PVector();
+
+  image(roi, imgPos.x, imgPos.y, roi.width, roi.height);
 
   noFill();
   stroke(0, 255, 0);
   strokeWeight(0.25);
-  ellipse(eyeCenter.x, eyeCenter.y, 5, 5);
+  ellipse(eyeCenter.x + imgPos.x, eyeCenter.y + imgPos.y, 5, 5);
 
   noFill();
   stroke(255, 0, 0);
   strokeWeight(0.5);
-  ellipse(center.x * eye.width, center.y * eye.height, 15, 15);
+  ellipse(center.x * eye.width + imgPos.x, center.y * eye.height + imgPos.y, 15, 15);
 
   popMatrix();
   opencv.releaseROI();
+}
+
+void addRect(Rectangle r)
+{
+  eyeRects[eyeRectIndex] = r;
+  eyeRectIndex = (eyeRectIndex + 1) % eyeRects.length;
 }
 
 void addCenter(PVector p)
@@ -241,7 +262,7 @@ void plotSight(int w, int h)
   for (int i = 0; i < lines; i++)
   {
     int ri = Math.floorMod(centerPointIndex - i, centerPoints.length);
-    float xv = (centerPoints[ri] == null) ? 0.0f : centerPoints[ri].x;
+    float xv = (centerPoints[ri] == null) ? 0.0f : 1.0f - centerPoints[ri].x;
     float yv = (centerPoints[ri] == null) ? 0.0f : centerPoints[ri].y;
 
     float b =  map(i, 0, lines - 1, 20, 255);
@@ -254,5 +275,33 @@ void plotSight(int w, int h)
   noFill();
   stroke(255, 0, 0);
   strokeWeight(1);
-  ellipse(center.x * w, center.y * h, 20, 20);
+  ellipse((1.0f - center.x) * w, center.y * h, 20, 20);
+}
+
+Rectangle getAverageRectangle()
+{
+  Rectangle average = new Rectangle();
+
+  int counter = 0;
+  for (int i = 0; i < eyeRects.length; i++)
+  {
+    if (eyeRects[i] == null)
+      continue;
+
+    average.x += eyeRects[i].x;
+    average.y += eyeRects[i].y;
+
+    average.width += eyeRects[i].width;
+    average.height += eyeRects[i].height;
+
+    counter++;
+  }
+
+  average.x /= counter;
+  average.y /= counter;
+
+  average.width /= counter;
+  average.height /= counter;
+
+  return average;
 }

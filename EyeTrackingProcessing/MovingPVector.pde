@@ -1,7 +1,7 @@
 class MovingPVector extends PVector
 {
   PVector target = new PVector();
-  float alpha = 0.05f;
+  float alpha = 0.1f;
 
   void update()
   {

@@ -44,8 +44,8 @@ void setupUI()
 
   h += 25;
   cp5.addSlider("scaleFactor", 10, 150, 10, h, 100, 20)
-    .setRange(1.0, 2.5)
-    .setNumberOfTickMarks(30)
+    .setRange(1.1, 5.0)
+    .setNumberOfTickMarks(50)
     .showTickMarks(false)
     .setLabel("Scale Factor");
 
