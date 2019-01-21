@@ -8,7 +8,7 @@ Capture cam;
 OpenCV opencv;
 Rectangle[] eyes;
 
-int inputWidth = 320;
+int inputWidth = 640;
 int inputHeight = round(inputWidth * 0.75);
 
 int viewWidth = 640;
@@ -129,7 +129,7 @@ void detectEyes(PImage frame)
 }
 
 void renderROIs()
-{
+{ 
   // add eye if there is one
   if (eyes.length > 0)
   {
@@ -306,6 +306,11 @@ Rectangle getAverageRectangle()
     average.height += eyeRects[i].height;
 
     counter++;
+  }
+
+  if (counter < 1)
+  {
+    return average;
   }
 
   average.x /= counter;
