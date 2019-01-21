@@ -130,22 +130,24 @@ void detectEyes(PImage frame)
 
 void renderROIs()
 {
-  if (eyes.length < 1)
-    return;
-
-  // find most right
-  Rectangle eye = eyes[0];
-
-  for (int i = 0; i < eyes.length; i++)
+  // add eye if there is one
+  if (eyes.length > 0)
   {
-    if (eyes[i].x < eye.x)
+    // find most right
+    Rectangle rightEye = eyes[0];
+
+    for (int i = 0; i < eyes.length; i++)
     {
-      eye = eyes[i];
+      if (eyes[i].x < rightEye.x)
+      {
+        rightEye = eyes[i];
+      }
     }
+
+    addRect(rightEye);
   }
 
-  addRect(eye);
-  eye = getAverageRectangle();
+  Rectangle eye = getAverageRectangle();
 
   // read ROI  
   opencv.setROI(eye.x, eye.y, eye.width, eye.height);
